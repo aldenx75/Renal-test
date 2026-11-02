@@ -1,8 +1,0 @@
-your-repo/
-├── index.html
-├── json/
-│   ├── biochem_lecture1.json
-│   └── anatomy_lecture2.json
-└── slides/
-    ├── biochem_lecture1.pdf
-    └── anatomy_lecture2.pdf

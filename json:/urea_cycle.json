@@ -1,0 +1,147 @@
+{
+  "lecture_id": "urea_cycle_part1_2",
+  "lecture_name": "Nitrogen Disposal and The Urea Cycle I & II",
+  "pdf_filename": "urea_cycle.pdf",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "A 6-year-old boy is brought to the clinic because of a red, scaly skin rash over his face, neck, and back of his hands that worsens after exposure to sunlight, along with recent erratic behavior and unsteady gait. Laboratory evaluation reveals elevated neutral amino acids in the urine. A deficiency in which of the following substances is the primary underlying cause of this patient's pellagra-like symptoms?",
+      "options": [
+        "Niacin (vitamin B3) synthesized from tryptophan",
+        "Pyridoxal phosphate (vitamin B6) required for transamination",
+        "Tetrahydrobiopterin (BH4) involved in aromatic hydroxylation",
+        "Thiamine pyrophosphate (vitamin B1) used in decarboxylation",
+        "Ascorbic acid (vitamin C) required for collagen synthesis"
+      ],
+      "correct_index": 0,
+      "explanation": "Hartnup disease is an autosomal recessive disorder caused by mutations in a Na+-dependent neutral amino acid cotransporter in the intestine and renal proximal tubules. Impaired absorption and reabsorption of neutral amino acids, particularly tryptophan, leads to tryptophan deficiency. Because tryptophan is an essential precursor for endogenous niacin (vitamin B3) synthesis (required for NAD+ and NADP+ production), affected patients develop niacin deficiency resulting in pellagra-like symptoms (dermatitis in sun-exposed areas, cerebellar ataxia, and psychiatric symptoms). Treatment requires dietary niacin supplementation.",
+      "slide_number": 6
+    },
+    {
+      "id": "q2",
+      "question": "A 21-year-old man presents to the emergency department with severe right flank pain radiating to his groin and hematuria. Urinalysis demonstrates hexagonal crystals. Analysis of his urine reveals impaired renal reabsorption of cystine, ornithine, arginine, and lysine. Which segment of the nephron normally performs the transport process that is defective in this patient?",
+      "options": [
+        "Glomerular capillary endothelium",
+        "Thin descending limb of Henle loop",
+        "Proximal convoluted tubule",
+        "Distal convoluted tubule",
+        "Cortical collecting duct"
+      ],
+      "correct_index": 2,
+      "explanation": "Cystinuria is an inherited disorder characterized by defective reabsorption of cystine and dibasic amino acids (Ornithine, Arginine, Lysine) in the epithelial cells of the proximal convoluted tubule and small intestine. Inability to reabsorb filtered cystine leads to its accumulation and precipitation in the urinary tract, forming characteristic hexagonal cystine kidney stones that cause renal colic and hematuria.",
+      "slide_number": 5
+    },
+    {
+      "id": "q3",
+      "question": "A 42-year-old woman presents with fatigue, mild jaundice, and right upper quadrant abdominal tenderness following an acute acetaminophen overdose. Serum biochemistry reveals severe hepatocellular necrosis with marked elevations of both alanine aminotransferase (ALT) and aspartate aminotransferase (AST). Which of the following features explains why serum ALT is considered a more specific marker for liver injury compared to AST?",
+      "options": [
+        "ALT is expressed exclusively in the mitochondrial matrix of hepatocytes",
+        "ALT requires pyridoxal phosphate as a coenzyme, whereas AST does not",
+        "ALT directly synthesizes urea from free ammonia and carbon dioxide",
+        "ALT activity is allosterically inhibited by high levels of guanosine triphosphate",
+        "ALT is predominantly cytosolic and primarily localized to hepatic tissue"
+      ],
+      "correct_index": 4,
+      "explanation": "Alanine aminotransferase (ALT) and aspartate aminotransferase (AST) are both elevated in hepatocellular damage. However, ALT is predominantly cytosolic and found primarily in hepatocytes, making it a more specific indicator of liver injury. In contrast, AST is abundant in liver but also widely distributed in cardiac muscle, skeletal muscle, and kidneys, with both cytosolic and mitochondrial isoenzymes.",
+      "slide_number": 10
+    },
+    {
+      "id": "q4",
+      "question": "A 35-year-old woman undergoing treatment for pulmonary tuberculosis with isoniazid presents with numbness and tingling in her feet. Laboratory evaluation confirms peripheral neuropathy. She is found to have impaired transamination reactions during amino acid catabolism. Which of the following coenzymes is directly depleted by her antitubercular medication, impairing aminotransferase function?",
+      "options": [
+        "Thiamine pyrophosphate (TPP)",
+        "Pyridoxal phosphate (PLP)",
+        "Flavin adenine dinucleotide (FAD)",
+        "Tetrahydrofolate (THF)",
+        "Biocytin (biotin)"
+      ],
+      "correct_index": 1,
+      "explanation": "All aminotransferases (transaminases) require the coenzyme pyridoxal phosphate (PLP, a derivative of vitamin B6) to act as a temporary carrier of the amino group during transamination reactions. Isoniazid inactivates vitamin B6 and inhibits pyridoxal kinase, leading to PLP deficiency and peripheral neuropathy unless supplemented with vitamin B6.",
+      "slide_number": 8
+    },
+    {
+      "id": "q5",
+      "question": "A biochemistry researcher investigates hepatic mitochondrial enzymes involved in nitrogen disposal. She isolates an enzyme that catalyzes the reversible conversion of glutamate to alpha-ketoglutarate and free ammonium. The enzyme can utilize either NAD+ or NADPH depending on whether it is driving oxidative deamination or reductive amination. Which of the following allosteric effectors acts as a direct activator of this mitochondrial enzyme?",
+      "options": [
+        "Guanosine triphosphate (GTP)",
+        "Adenosine triphosphate (ATP)",
+        "N-Acetylglutamate (NAG)",
+        "Guanosine diphosphate (GDP)",
+        "Citrulline"
+      ],
+      "correct_index": 3,
+      "explanation": "Glutamate dehydrogenase (GDH) is a mitochondrial matrix enzyme abundant in liver and kidney that catalyzes the oxidative deamination of glutamate to alpha-ketoglutarate and free ammonia (using NAD+), or the reverse reductive amination (using NADPH). GDH is allosterically inhibited by high-energy signals (GTP, ATP) and activated by low-energy signals (GDP, ADP).",
+      "slide_number": 11
+    },
+    {
+      "id": "q6",
+      "question": "A 58-year-old man with end-stage cirrhosis and portal hypertension presents with confusion, asterixis, and lethargy due to hepatic encephalopathy. Analysis of nitrogen transport demonstrates that extrahepatic peripheral tissues safely detoxify excess ammonia before releasing it into the bloodstream. Which enzyme catalyzes the addition of free ammonia to glutamate in peripheral tissues to form this non-toxic circulating nitrogen carrier?",
+      "options": [
+        "Glutaminase",
+        "Glutamate dehydrogenase",
+        "Glutamine synthetase",
+        "Alanine aminotransferase",
+        "Carbamoyl phosphate synthetase I"
+      ],
+      "correct_index": 2,
+      "explanation": "Peripheral tissues synthesize glutamine to safely transport toxic free ammonia through the blood to the liver. Glutamine synthetase uses ATP to combine free ammonia (NH3) with glutamate to produce glutamine. Glutamine is then transported in the circulation to the liver (and kidneys), where glutaminase cleaves it back into glutamate and free ammonia for urea synthesis or acid-base regulation.",
+      "slide_number": 13
+    },
+    {
+      "id": "q7",
+      "question": "A 2-day-old male newborn develops severe lethargy, hypothermia, hyperventilation, and poor feeding. Blood tests reveal a serum ammonia concentration of 450 µmol/L and markedly reduced blood urea nitrogen (BUN). Genetic testing confirms a mutation affecting the rate-limiting enzyme of the urea cycle located in the mitochondrial matrix. Which of the following molecules acts as an obligate allosteric activator required for full activity of this rate-limiting enzyme?",
+      "options": [
+        "N-Acetylglutamate",
+        "Argininosuccinate",
+        "Oxaloacetate",
+        "Pyridoxal phosphate",
+        "Fumarate"
+      ],
+      "correct_index": 0,
+      "explanation": "Carbamoyl phosphate synthetase I (CPS-I) catalyzes the rate-limiting step of the urea cycle in the mitochondrial matrix, condensing free ammonia, bicarbonate, and 2 ATP to form carbamoyl phosphate. CPS-I has an absolute requirement for N-acetylglutamate (NAG) as an essential allosteric activator. NAG is synthesized from acetyl-CoA and glutamate by NAG synthase (NAGS), which is itself stimulated by arginine.",
+      "slide_number": 15
+    },
+    {
+      "id": "q8",
+      "question": "A 3-day-old male infant presents with progressive lethargy, vomiting, and seizures. Laboratory evaluation demonstrates severe hyperammonemia, low blood urea nitrogen (BUN), undetectable serum citrulline, and significantly elevated urine orotic acid levels. Family history reveals that a maternal uncle died in infancy of an unknown metabolic disorder. Which of the following modes of inheritance and underlying enzyme defects best accounts for this infant's condition?",
+      "options": [
+        "Autosomal recessive deficiency of Carbamoyl Phosphate Synthetase I",
+        "Autosomal recessive deficiency of N-Acetylglutamate Synthase",
+        "Autosomal recessive deficiency of Argininosuccinate Synthetase",
+        "Autosomal recessive deficiency of Arginase",
+        "X-linked recessive deficiency of Ornithine Transcarbamoylase"
+      ],
+      "correct_index": 4,
+      "explanation": "Ornithine transcarbamoylase (OTC) deficiency is the most common inborn error of the urea cycle and is uniquely inherited in an X-linked recessive pattern (all other urea cycle enzyme defects are autosomal recessive). Blockade of OTC causes mitochondrial carbamoyl phosphate accumulation, which leaks into the cytosol and drives pyrimidine synthesis, leading to massive orotic acid accumulation in urine (orotic aciduria). In contrast, CPS-I deficiency also causes hyperammonemia and low citrulline but with normal orotic acid levels.",
+      "slide_number": 17
+    },
+    {
+      "id": "q9",
+      "question": "A medical student studying nitrogen disposal reviews the stoichiometry of urea molecule assembly in human hepatocytes. She notes that urea contains two nitrogen atoms and one carbon atom, which are eliminated by the kidney. Which of the following pairs of compounds directly donates the two nitrogen atoms that form a molecule of urea?",
+      "options": [
+        "Glutamine and alanine",
+        "Glutamate and glycine",
+        "Carbamoyl phosphate and citrulline",
+        "Free ammonia and aspartate",
+        "Ornithine and arginine"
+      ],
+      "correct_index": 3,
+      "explanation": "The urea cycle incorporates two nitrogen atoms and one carbon atom into each molecule of urea. The first nitrogen atom enters as free ammonia (NH3) in the mitochondrial matrix during the CPS-I reaction to form carbamoyl phosphate. The second nitrogen atom is donated in the cytosol by aspartate during the argininosuccinate synthetase reaction (condensing citrulline and aspartate into argininosuccinate).",
+      "slide_number": 18
+    },
+    {
+      "id": "q10",
+      "question": "A 4-week-old female infant with argininosuccinate lyase (ASL) deficiency is managed by a pediatric biochemical geneticist. Laboratory tests show elevated serum argininosuccinate levels and hyperammonemia. The physician prescribes dietary arginine supplementation. What is the primary mechanism by which arginine supplementation aids in nitrogen removal in patients with this enzyme deficiency?",
+      "options": [
+        "Direct inhibition of intestinal bacterial urease activity",
+        "Regeneration of ornithine allowing nitrogen excretion as argininosuccinate",
+        "Allosteric activation of carbamoyl phosphate synthetase II",
+        "Induction of hepatic glutamate dehydrogenase expression",
+        "Chelation of circulating ammonium ions in the blood"
+      ],
+      "correct_index": 1,
+      "explanation": "In argininosuccinate lyase (ASL) deficiency, the cleavage of argininosuccinate to arginine and fumarate is impaired. Supplementing dietary arginine provides the substrate needed to regenerate ornithine (via arginase), allowing the urea cycle to proceed up to argininosuccinate. Nitrogen is thus effectively trapped and excreted in urine in the form of argininosuccinate (containing 2 nitrogen atoms), bypassing the metabolic block.",
+      "slide_number": 21
+    }
+  ]
+}

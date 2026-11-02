@@ -1,415 +1,1653 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Hub & Quiz Tracker</title>
+  <title>Renal Quiz Bank - Medical Study Platform</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #38bdf8;
-      --text: #f8fafc;
-      --success: #22c55e;
-      --danger: #ef4444;
-    }
     body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', sans-serif;
     }
-    header {
-      background: #020617;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #334155;
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    nav button {
+    .custom-scrollbar::-webkit-scrollbar-track {
       background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-left: 0.5rem;
-      font-weight: bold;
     }
-    nav button.active {
-      background: var(--accent);
-      color: var(--bg);
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
     }
-    main {
-      padding: 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    .view { display: none; }
-    .view.active { display: block; }
-    
-    /* Card Styles */
-    .card {
-      background: var(--card);
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-      border: 1px solid #334155;
-    }
-    
-    /* Quiz Options */
-    .option-btn {
-      display: block;
-      width: 100%;
-      text-align: left;
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #334155;
-      color: var(--text);
-      border: none;
-      padding: 0.8rem 1rem;
-      margin: 0.5rem 0;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
     }
-    .option-btn:hover { background: #475569; }
-    .option-btn.correct { background: var(--success) !important; color: white; }
-    .option-btn.incorrect { background: var(--danger) !important; color: white; }
-    
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    .stat-box {
-      background: #020617;
-      padding: 1rem;
-      border-radius: 6px;
-      text-align: center;
-    }
-    .stat-number {
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--accent);
-    }
-    
-    /* PDF Viewer */
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 8px;
+    .strikethrough-option {
+      text-decoration: line-through;
+      opacity: 0.55;
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-full flex flex-col transition-colors duration-200">
 
-  <header>
-    <h2>⚡ Study Hub</h2>
-    <nav>
-      <button class="active" onclick="switchTab('quiz')">Quizzes</button>
-      <button onclick="switchTab('slides')">Slides</button>
-      <button onclick="switchTab('stats')">Analytics</button>
-    </nav>
-  </header>
-
-  <main>
-    <!-- QUIZ VIEW -->
-    <div id="quiz" class="view active">
-      <div class="card">
-        <span id="quiz-lecture-tag" style="color: var(--accent); font-weight: bold; font-size: 0.85rem;"></span>
-        <h3 id="quiz-question">Loading Question...</h3>
-        <div id="quiz-options"></div>
-        <p id="quiz-feedback" style="font-weight: bold; margin-top: 1rem;"></p>
-        <button id="next-btn" style="display:none; padding: 0.5rem 1rem; background: var(--accent); border:none; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="loadNextQuestion()">Next Question</button>
-      </div>
-    </div>
-
-    <!-- SLIDES VIEW -->
-    <div id="slides" class="view">
-      <div class="card">
-        <h3>Lecture Slides</h3>
-        <select id="slide-select" onchange="changeSlide()" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #334155; color: white; border: none; border-radius: 4px;">
-          <option value="3-4. Urea cycle.pdf">Lecture 1: Introduction</option>
-          <option value="slides/lecture2.pdf">Lecture 2: Advanced Topics</option>
-        </select>
-        <iframe id="pdf-viewer" src="3-4. Urea cycle.pdf"></iframe>
-      </div>
-    </div>
-
-    <!-- STATS VIEW -->
-    <div id="stats" class="view">
-      <div class="card">
-        <h3>Performance Summary</h3>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div id="stat-total" class="stat-number">0</div>
-            <div>Questions Completed</div>
-          </div>
-          <div class="stat-box">
-            <div id="stat-accuracy" class="stat-number">0%</div>
-            <div>Overall Accuracy</div>
-          </div>
+  <!-- TOP HEADER BAR (Matches Screenshot) -->
+  <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('launcher')">
+        <div class="bg-brand-600 w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-white text-xl shadow-inner shadow-brand-400/30">
+          R
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold leading-tight text-white tracking-tight">Renal Quiz Bank</h1>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Renal & Clinical Question Bank</p>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Performance by Lecture Topic</h3>
-        <div id="topic-breakdown">No data recorded yet.</div>
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-1 bg-slate-950/50 p-1 rounded-xl border border-slate-800">
+        <button id="nav-launcher" onclick="switchTab('launcher')" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all">Launcher</button>
+        <button id="nav-quiz" onclick="switchTab('quiz')" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all relative">
+          Quiz Engine
+          <span id="active-quiz-badge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full animate-ping"></span>
+        </button>
+        <button id="nav-review" onclick="switchTab('review')" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all">Review</button>
+        <button id="nav-analytics" onclick="switchTab('analytics')" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all">Analytics</button>
+        <button id="nav-bank" onclick="switchTab('bank')" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all">Bank</button>
+      </nav>
+
+      <!-- Right Controls & Mobile Menu -->
+      <div class="flex items-center space-x-3">
+        <!-- Preset / Status Badge -->
+        <div class="hidden lg:flex items-center bg-slate-800 px-3 py-1 rounded-lg border border-slate-700 text-xs text-slate-300 gap-1.5 font-medium">
+          <span>🏥</span>
+          <span>Default Medical Bank</span>
+        </div>
+
+        <!-- Dark/Light Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-colors" title="Toggle Light/Dark Theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Mobile Nav Menu Button -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
       </div>
-      <button onclick="resetStats()" style="background: var(--danger); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Reset Analytics Data</button>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+      <button onclick="switchTab('launcher'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Launcher</button>
+      <button onclick="switchTab('quiz'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Quiz Engine</button>
+      <button onclick="switchTab('review'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Review</button>
+      <button onclick="switchTab('analytics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Analytics</button>
+      <button onclick="switchTab('bank'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Bank / Manager</button>
+    </div>
+  </header>
+
+  <!-- MAIN APPLICATION CONTAINER CARD -->
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-8 my-4 md:my-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+
+      <!-- PAGE 1: LAUNCHER PAGE -->
+      <section id="page-launcher" class="space-y-8">
+        <!-- Header text -->
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Create Custom Study Session</h2>
+          <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">Select your target categories & specific uploaded lectures, question status filters, and testing parameters.</p>
+        </div>
+
+        <!-- CATEGORY & LECTURE SELECTOR ACCORDION -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between pb-1">
+            <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Select Categories & Uploaded Lectures</h3>
+            <div class="space-x-3 text-xs sm:text-sm font-semibold">
+              <button onclick="selectAllCategories(true)" class="text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline">Select All</button>
+              <button onclick="selectAllCategories(false)" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 hover:underline">Deselect All</button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 dark:text-slate-500">Expand any category to toggle specific uploaded lectures.</p>
+
+          <!-- Dynamic Accordion List -->
+          <div id="category-accordion-list" class="space-y-3 mt-2">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- QUESTION STATUS FILTER (Radio Pill Grid) -->
+        <div class="space-y-3 pt-2">
+          <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Filter By Question Status</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="status-filter-pills">
+            <label class="status-pill cursor-pointer border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center space-x-2.5 hover:border-brand-500 dark:hover:border-brand-500 transition-all bg-slate-50/50 dark:bg-slate-950/30">
+              <input type="radio" name="statusFilter" value="all" checked onchange="updateLauncherCounts()" class="w-4 h-4 text-brand-600 focus:ring-brand-500 accent-brand-600">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">All Questions</span>
+            </label>
+            <label class="status-pill cursor-pointer border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center space-x-2.5 hover:border-brand-500 dark:hover:border-brand-500 transition-all bg-slate-50/50 dark:bg-slate-950/30">
+              <input type="radio" name="statusFilter" value="unused" onchange="updateLauncherCounts()" class="w-4 h-4 text-brand-600 focus:ring-brand-500 accent-brand-600">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Unused Only</span>
+            </label>
+            <label class="status-pill cursor-pointer border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center space-x-2.5 hover:border-brand-500 dark:hover:border-brand-500 transition-all bg-slate-50/50 dark:bg-slate-950/30">
+              <input type="radio" name="statusFilter" value="incorrect" onchange="updateLauncherCounts()" class="w-4 h-4 text-brand-600 focus:ring-brand-500 accent-brand-600">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Incorrect Only</span>
+            </label>
+            <label class="status-pill cursor-pointer border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center space-x-2.5 hover:border-brand-500 dark:hover:border-brand-500 transition-all bg-slate-50/50 dark:bg-slate-950/30">
+              <input type="radio" name="statusFilter" value="correct" onchange="updateLauncherCounts()" class="w-4 h-4 text-brand-600 focus:ring-brand-500 accent-brand-600">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Correct Only</span>
+            </label>
+            <label class="status-pill cursor-pointer border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center space-x-2.5 hover:border-brand-500 dark:hover:border-brand-500 transition-all bg-slate-50/50 dark:bg-slate-950/30">
+              <input type="radio" name="statusFilter" value="bookmarked" onchange="updateLauncherCounts()" class="w-4 h-4 text-brand-600 focus:ring-brand-500 accent-brand-600">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Bookmarked</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- TESTING PARAMETERS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <!-- Number of Questions -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="question-count-input" class="text-sm font-bold text-slate-800 dark:text-slate-200">Number of Questions</label>
+              <span id="available-questions-label" class="text-xs font-semibold text-brand-600 dark:text-brand-400">Available: 0</span>
+            </div>
+            <input type="number" id="question-count-input" min="1" max="100" value="10" 
+              class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-950 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+          </div>
+
+          <!-- Quiz Mode Dropdown -->
+          <div>
+            <label for="quiz-mode-select" class="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-1.5">Quiz Mode</label>
+            <select id="quiz-mode-select" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-950 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+              <option value="practice">Practice Mode (Instant Feedback)</option>
+              <option value="test">Test Mode (Final Submission & Grade)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Checkbox Toggles -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-1">
+          <label class="inline-flex items-center space-x-2.5 cursor-pointer">
+            <input type="checkbox" id="randomize-questions" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 accent-brand-600">
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Randomize Question Order</span>
+          </label>
+          <label class="inline-flex items-center space-x-2.5 cursor-pointer">
+            <input type="checkbox" id="randomize-choices" checked class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 accent-brand-600">
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Randomize Choices (A-E)</span>
+          </label>
+        </div>
+
+        <!-- Primary Start Session Button -->
+        <div class="pt-4">
+          <button onclick="startQuizSession()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg py-4 px-6 rounded-2xl shadow-lg shadow-brand-500/25 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center space-x-2">
+            <span>Start Quiz Session</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- PAGE 2: QUIZ ENGINE PAGE -->
+      <section id="page-quiz" class="hidden space-y-6">
+        <!-- Empty / No active session fallback -->
+        <div id="quiz-empty-state" class="text-center py-16 space-y-4">
+          <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-3xl">🎯</div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-white">No Active Quiz Session</h3>
+          <p class="text-sm text-slate-500 max-w-md mx-auto">Please select your subject categories and parameters on the Launcher page to start a new quiz.</p>
+          <button onclick="switchTab('launcher')" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold shadow">Go to Launcher</button>
+        </div>
+
+        <!-- Active Quiz Header Toolbar -->
+        <div id="quiz-active-container" class="space-y-6 hidden">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center space-x-3">
+              <span id="quiz-mode-tag" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300">Practice Mode</span>
+              <span id="quiz-progress-text" class="text-sm font-bold text-slate-700 dark:text-slate-300">Question 1 of 10</span>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <!-- Timer -->
+              <div class="flex items-center space-x-1.5 text-sm font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span>⏱️</span>
+                <span id="quiz-timer">00:00</span>
+              </div>
+
+              <!-- Bookmark Button -->
+              <button id="bookmark-btn" onclick="toggleCurrentBookmark()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <span id="bookmark-star">★</span>
+                <span id="bookmark-text">Bookmark</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div id="quiz-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-300"></div>
+          </div>
+
+          <!-- QUESTION CONTENT CARD -->
+          <div class="space-y-6">
+            <!-- Metadata Tags -->
+            <div class="flex flex-wrap gap-2 text-xs font-medium">
+              <span id="q-subject-badge" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">Biochemistry</span>
+              <span id="q-lecture-badge" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg">Lecture 1</span>
+            </div>
+
+            <!-- Question Stem -->
+            <div id="q-stem" class="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">
+              <!-- Question text -->
+            </div>
+
+            <!-- Choice Options List -->
+            <div id="q-options" class="space-y-3 pt-2">
+              <!-- Options generated via JS -->
+            </div>
+
+            <!-- Explanation Box (Instant feedback or post submit) -->
+            <div id="q-explanation-box" class="hidden rounded-2xl p-5 border transition-all space-y-2">
+              <div class="flex items-center space-x-2">
+                <span id="explanation-status-icon" class="text-xl"></span>
+                <h4 id="explanation-status-title" class="text-base font-bold">Explanation</h4>
+              </div>
+              <p id="explanation-text" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed pt-1"></p>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Toolbar -->
+          <div class="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-800">
+            <button id="btn-prev" onclick="navigateQuiz(-1)" class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed">
+              ← Previous
+            </button>
+
+            <!-- Navigation Grid Quick Jump Modal Toggle -->
+            <button onclick="toggleGridModal()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">
+              📊 Jump Grid
+            </button>
+
+            <div class="flex items-center space-x-2">
+              <button id="btn-next" onclick="navigateQuiz(1)" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow">
+                Next →
+              </button>
+              <button id="btn-submit-exam" onclick="submitExam()" class="hidden px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow">
+                Submit Exam ✓
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: REVIEW PAGE -->
+      <section id="page-review" class="hidden space-y-6">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Question Review</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Examine past responses, explanations, and key learning concepts.</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap gap-2 pt-1" id="review-filter-buttons">
+          <button onclick="filterReview('all')" id="rev-filter-all" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-brand-500 bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300">All Completed (<span id="rev-count-all">0</span>)</button>
+          <button onclick="filterReview('incorrect')" id="rev-filter-incorrect" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Incorrect Only (<span id="rev-count-incorrect">0</span>)</button>
+          <button onclick="filterReview('correct')" id="rev-filter-correct" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Correct Only (<span id="rev-count-correct">0</span>)</button>
+          <button onclick="filterReview('bookmarked')" id="rev-filter-bookmarked" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Bookmarked (<span id="rev-count-bookmarked">0</span>)</button>
+        </div>
+
+        <!-- Review List Stream -->
+        <div id="review-items-container" class="space-y-6 pt-2">
+          <!-- Dynamically populated review cards -->
+        </div>
+      </section>
+
+      <!-- PAGE 4: ANALYTICS PAGE -->
+      <section id="page-analytics" class="hidden space-y-8">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Performance Analytics</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Track your accuracy trends, domain mastery, and study recommendations.</p>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Completed</span>
+            <div id="kpi-total-completed" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">0</div>
+            <span class="text-xs text-slate-400 mt-1 block">Total questions submitted</span>
+          </div>
+
+          <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Overall Accuracy</span>
+            <div id="kpi-accuracy" class="text-2xl sm:text-3xl font-black text-brand-600 dark:text-brand-400 mt-2">0%</div>
+            <span class="text-xs text-slate-400 mt-1 block">Correct response rate</span>
+          </div>
+
+          <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Bookmarked</span>
+            <div id="kpi-bookmarks" class="text-2xl sm:text-3xl font-black text-amber-500 mt-2">0</div>
+            <span class="text-xs text-slate-400 mt-1 block">Saved for review</span>
+          </div>
+
+          <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Question Coverage</span>
+            <div id="kpi-coverage" class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2">0%</div>
+            <span class="text-xs text-slate-400 mt-1 block">Unique bank questions seen</span>
+          </div>
+        </div>
+
+        <!-- Subject Breakdown Bars -->
+        <div class="space-y-4">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Subject Accuracy Breakdown</h3>
+          <div id="analytics-subject-bars" class="space-y-4 bg-slate-50/50 dark:bg-slate-950/30 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <!-- Bars injected here -->
+          </div>
+        </div>
+
+        <!-- Smart Recommendations Box -->
+        <div class="bg-blue-50 dark:bg-slate-950/80 border border-blue-200 dark:border-brand-900/50 rounded-2xl p-6 space-y-3">
+          <div class="flex items-center space-x-2 text-brand-700 dark:text-brand-300">
+            <span class="text-xl">💡</span>
+            <h3 class="text-lg font-bold">Smart Study Recommendations</h3>
+          </div>
+          <div id="smart-recommendations-content" class="text-sm text-slate-700 dark:text-slate-300 space-y-2">
+            <!-- Dynamic recommendation list -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 5: BANK / JSON MANAGER PAGE -->
+      <section id="page-bank" class="hidden space-y-8">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Question Bank & NotebookLM JSON Manager</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage loaded medical lecture datasets, import NotebookLM generated JSON files, or configure GitHub Pages sync.</p>
+        </div>
+
+        <!-- Bank Statistics Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <span class="text-xs font-semibold text-slate-500">Total Bank Questions</span>
+            <div id="bank-stat-total" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</div>
+          </div>
+          <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <span class="text-xs font-semibold text-slate-500">Active Categories</span>
+            <div id="bank-stat-categories" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</div>
+          </div>
+          <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <span class="text-xs font-semibold text-slate-500">Loaded Lectures</span>
+            <div id="bank-stat-lectures" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</div>
+          </div>
+        </div>
+
+        <!-- Upload & Paste Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- File Dropzone Upload -->
+          <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center space-y-3 bg-slate-50/50 dark:bg-slate-950/20 hover:border-brand-500 transition-colors">
+            <div class="w-12 h-12 bg-brand-100 dark:bg-brand-950/50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold">📁</div>
+            <div>
+              <h4 class="text-base font-bold text-slate-900 dark:text-white">Upload JSON Question Files</h4>
+              <p class="text-xs text-slate-500 mt-1">Select one or multiple `.json` files generated from NotebookLM.</p>
+            </div>
+            <input type="file" id="json-file-input" accept=".json" multiple onchange="handleFileUpload(event)" class="hidden">
+            <button onclick="document.getElementById('json-file-input').click()" class="px-4 py-2 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all">
+              Choose Files
+            </button>
+          </div>
+
+          <!-- Raw JSON Paste Area -->
+          <div class="space-y-2">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Paste NotebookLM JSON Content</h4>
+            <textarea id="json-paste-area" rows="4" placeholder='[{"id":"q1", "subject":"Biochemistry", "lecture":"L1", "question":"...", "options":["A","B","C","D"], "answer":0, "explanation":"..."}]' class="w-full p-3 text-xs font-mono border border-slate-300 dark:border-slate-700 dark:bg-slate-950 rounded-xl outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+            <button onclick="handleJSONPaste()" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition-all">
+              Import Pasted JSON
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Reset & Backup Actions -->
+        <div class="flex flex-wrap gap-3 pt-2">
+          <button onclick="loadDefaultDataset()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all">
+            🔄 Reset to Pre-loaded Renal Dataset
+          </button>
+          <button onclick="exportUserData()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all">
+            📥 Export Study History JSON
+          </button>
+          <button onclick="clearHistory()" class="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl transition-all">
+            ⚠️ Reset All Progress History
+          </button>
+        </div>
+
+        <!-- GitHub Pages Setup Guide -->
+        <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+            <span>🚀</span>
+            <span>How to Host on GitHub Pages & Structure NotebookLM JSONs</span>
+          </h3>
+          <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-3 leading-relaxed">
+            <p>1. <strong>Save File:</strong> Save this entire code file as <code class="bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200">index.html</code> in the root of your GitHub Repository.</p>
+            <p>2. <strong>Upload Lecture JSONs:</strong> Create a folder named <code class="bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200">/lectures</code> and upload your NotebookLM JSON files (e.g., <code class="bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200">renal_biochem_l1.json</code>).</p>
+            <p>3. <strong>Expected NotebookLM JSON Schema:</strong></p>
+            <pre class="bg-slate-900 text-slate-200 p-4 rounded-xl text-xs overflow-x-auto font-mono">
+[
+  {
+    "id": "biochem_l1_01",
+    "subject": "Biochemistry",
+    "lecture": "Renal Transporters & Acid-Base",
+    "question": "Which luminal transporter in the proximal convoluted tubule is directly targeted by acetazolamide?",
+    "options": [
+      "Sodium-Glucose Cotransporter 2 (SGLT2)",
+      "Sodium-Hydrogen Exchanger 3 (NHE3) via Carbonic Anhydrase Inhibition",
+      "Sodium-Potassium-2Chloride Cotransporter (NKCC2)",
+      "Thiazide-sensitive NaCl Cotransporter (NCC)"
+    ],
+    "answer": 1,
+    "explanation": "Acetazolamide inhibits carbonic anhydrase (CA II intracellularly and CA IV brush border), reducing HCO3- reabsorption and impairing NHE3 Na+/H+ exchange."
+  }
+]</pre>
+            <p>4. <strong>Enable Pages:</strong> In your GitHub repository settings, navigate to <strong>Pages</strong> &rarr; Branch: <strong>main</strong> / root &rarr; <strong>Save</strong>. Your personal quiz bank will be live instantly!</p>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
+  <!-- JUMP GRID MODAL -->
+  <div id="grid-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-lg w-full border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">Question Navigator</h3>
+        <button onclick="toggleGridModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <div id="grid-buttons-container" class="grid grid-cols-5 sm:grid-cols-8 gap-2 max-h-60 overflow-y-auto custom-scrollbar p-1">
+        <!-- Injected JS grid buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE APPLICATION JAVASCRIPT ENGINE -->
   <script>
-    // --- 1. NOTEBOOK LM QUIZ DATA ---
-    // Copy-paste quiz questions exported from NotebookLM here:
-    const quizData = [
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 28-year-old man presents with hemoptysis and progressive shortness of breath. Physical examination reveals bilateral pulmonary crackles on auscultation. Urinalysis demonstrates dysmorphic red blood cells and red blood cell casts. Renal biopsy demonstrates crescentic glomerulonephritis on light microscopy. Direct immunofluorescence staining reveals linear IgG deposition along the basement membrane of the renal corpuscles. Which of the following molecular structures is the primary target of these autoantibodies?",
-    "options": [
-      "Nephrin protein within filtration slit diaphragms",
-      "Podocalyxin glycocalyx on foot process surfaces",
-      "Type IV collagen in the fused basement membrane",
-      "P-cadherin forming tight junctions between pedicels",
-      "Fenestrated endothelial cell surface glycoprotein"
-    ],
-    "answer": 2
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A male infant presents shortly after birth with severe generalized edema, ascites, and marked abdominal distension. Laboratory evaluation reveals massive proteinuria and severe hypoalbuminemia. Genetic testing confirms an autosomal recessive mutation in the NPHS1 gene. Kidney biopsy demonstrates mild mesangial hypercellularity, increased mesangial matrix, and irregular microcystic dilatation of the proximal convoluted tubules. Which of the following microscopic structures is directly disrupted as a result of this patient's underlying genetic mutation?",
-    "options": [
-      "Fenestrated capillary endothelium",
-      "Filtration slit diaphragms between podocyte foot processes",
-      "Glomerular basement membrane charge barrier",
-      "Simple squamous parietal layer of Bowman capsule",
-      "Parietal epithelial cells at the urinary pole"
-    ],
-    "answer": 1
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 45-year-old woman undergoes a renal biopsy during an evaluation for toxic tubulopathy. Microscopic examination of the renal cortical labyrinth shows cross sections of tubules lined by simple cuboidal epithelium. The luminal margins appear irregular due to a prominent brush border of densely packed microvilli. The cytoplasm is intensely acidophilic with abundant longitudinally oriented mitochondria in the basal domain, and individual lateral cell boundaries are indistinct. Which of the following physiological processes is primarily carried out by the segment of the nephron described in this biopsy?",
-    "options": [
-      "Active transport of sodium ions without water reabsorption",
-      "Concentration of urine under the influence of antidiuretic hormone",
-      "Secretion of hydrogen ions by intercalated dark cells",
-      "Reabsorption of all filtered glucose and amino acids",
-      "Calcium reabsorption mediated by parathyroid hormone"
-    ],
-    "answer": 3
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 52-year-old man with severe renovascular hypertension due to renal artery stenosis undergoes diagnostic evaluation. Laboratory studies demonstrate marked hyperreninemia. Histological examination of his renal cortical tissue identifies modified smooth muscle cells containing secretory granules situated within the wall of the afferent arteriole near the vascular pole of the renal corpuscle. Which of the following mechanisms directly triggers the endocrine function of these modified arterial cells?",
-    "options": [
-      "Detection of decreased arterial blood pressure by mechanoreceptors",
-      "Monitoring of elevated luminal sodium concentration by osmoreceptors",
-      "Direct stimulation by antidiuretic hormone from the posterior pituitary",
-      "Secretion of parathyroid hormone in response to hypocalcemia",
-      "Passive diffusion of water through aquaporin channels"
-    ],
-    "answer": 0
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 61-year-old woman presenting with severe dehydration and hypovolemia undergoes renal physiological testing. Analysis of her renal cortical tissue highlights a cluster of specialized, tall columnar epithelial cells with closely packed nuclei located at the transition from the distal straight tubule to the distal convoluted tubule, directly adjacent to the vascular pole. Which of the following functions is performed by these specialized tubular cells to help maintain blood pressure homeostasis?",
-    "options": [
-      "Direct synthesis and secretion of renin into the systemic circulation",
-      "Phagocytosis of macromolecular protein complexes stuck in the filtration barrier",
-      "Water reabsorption through luminal aquaporin channels in response to aldosterone",
-      "Secretion of calcitriol following initial hydroxylation of vitamin D",
-      "Monitoring of luminal sodium and chloride concentrations in tubular fluid"
-    ],
-    "answer": 4
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 34-year-old man presents with unquenchable thirst, extreme polyuria, and hypernatremia. Diagnostic workup confirms central diabetes insipidus resulting from a complete lack of neurohypophyseal antidiuretic hormone release. Examination of a renal tissue specimen shows collecting ducts lined by simple cuboidal epithelium located within the cortical medullary rays, exhibiting prominent lateral cell boundaries. Which cell type within these collecting ducts is rendered dysfunctional in this patient due to the absence of antidiuretic hormone action?",
-    "options": [
-      "Alpha intercalated cells",
-      "Beta intercalated cells",
-      "Principal cells",
-      "Macula densa cells",
-      "Extraglomerular mesangial cells"
-    ],
-    "answer": 2
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A renal physiologist isolates individual micro-dissected nephron segments from the inner medulla of a mammalian kidney. One specific segment is lined by a thin simple squamous epithelium. Experimental measurements confirm that this segment possesses high passive permeability to sodium, chloride, and potassium ions, but is completely impermeable to water molecules. Which segment of the uriniferous tubule was isolated in this experiment?",
-    "options": [
-      "Proximal straight tubule",
-      "Thin descending limb of Henle loop",
-      "Thick ascending limb of Henle loop",
-      "Thin ascending limb of Henle loop",
-      "Cortical collecting duct"
-    ],
-    "answer": 3
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A 64-year-old man with a long-standing history of type 2 diabetes mellitus presents with worsening peripheral edema, hypertension, and heavy proteinuria. Renal biopsy reveals systemic microvascular sclerosis characterized by diffuse glomerular basement membrane thickening and nodular acellular scarring within the mesangial matrix. Which of the following non-pathologic physiological functions is normally performed by the resident mesangial cells within these affected glomeruli?",
-    "options": [
-      "Phagocytosis of proteins adhered to the glomerular filtration barrier",
-      "Formation of filtration slit diaphragms using nephrin and P-cadherin",
-      "Synthesis of active calcitriol via hydroxylation of precursor vitamin D",
-      "Filtration of plasma components through fenestrations lacking diaphragms",
-      "Production of antidiuretic hormone to regulate water permeability"
-    ],
-    "answer": 0
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A pathologist reviews a light microscopic section of the human renal cortex stained with hematoxylin and eosin. Surrounding several large, darkly staining acidophilic tubules with occluded lumens, the pathologist notes tubules lined by simple cuboidal epithelium featuring a clear, open lumen without a brush border, smaller cell size leading to more visible nuclei per cross section, and a less acidophilic cytoplasm. Which of the following physiological actions occurs specifically at the nephron segment exhibiting these histological features?",
-    "options": [
-      "Bulk reabsorption of filtered bicarbonate and amino acids",
-      "Sodium and water reabsorption in response to aldosterone",
-      "Synthesis of erythropoietin when arterial oxygen content drops",
-      "Hydroxylation of vitamin D into active calcitriol",
-      "Reabsorption of remaining glucose in the thick straight segment"
-    ],
-    "answer": 1
-  },
-  {
-    "lecture": "Lecture 1: Histology 1",
-    "question": "A histological section of the renal papilla near the apex of a renal pyramid shows large, converging epithelial ducts lined by tall simple columnar cells. Intercalated dark cells are completely absent. These large ducts converge at the area cribrosa to drain directly into a minor calyx. Which of the following statements correctly describes the fluid contained within the lumen of these terminal papillary ducts?",
-    "options": [
-      "It undergoes active glucose reabsorption via sodium co-transporters",
-      "It is modified by hydrogen ion secretion from alpha intercalated cells",
-      "It has an ultrafiltrate composition identical to blood plasma minus large proteins",
-      "It undergoes osmotic water concentration regulated by parathyroid hormone",
-      "It receives no further tubular fluid modification and is considered urine"
-    ],
-    "answer": 4
-  }
-]
+    /* ==========================================================================
+       1. DEFAULT PRE-LOADED MEDICAL QUESTION DATASET (HIGH YIELD RENAL)
+       ========================================================================== */
+    const DEFAULT_QUESTIONS = [
+      // Biochemistry
+      {
+        id: "bio_01",
+        subject: "Biochemistry",
+        lecture: "L1: Tubular Transporters & Acid-Base",
+        question: "A 45-year-old male with type 1 diabetes presents with muscle weakness. Blood gas analysis reveals a plasma HCO3- of 14 mEq/L, arterial pH of 7.28, and a normal serum anion gap. Urine pH is 6.2 despite systemic acidemia. Which tubular transport mechanism is most likely defective?",
+        options: [
+          "Proximal tubule Na+/H+ antiporter (NHE3)",
+          "Distal alpha-intercalated cell luminal H+-ATPase",
+          "Thiazide-sensitive Na+/Cl- cotransporter (NCC)",
+          "Loop of Henle Na+/K+/2Cl- cotransporter (NKCC2)",
+          "Medullary collecting duct urea transporter (UT-A1)"
+        ],
+        answer: 1,
+        explanation: "Distal (Type 1) Renal Tubular Acidosis (RTA) is characterized by impaired alpha-intercalated cell H+-ATPase (or H+/K+-ATPase) secretion of hydrogen ions. This prevents urinary acidification below pH 5.5 despite systemic acidemia, leading to hyperchloremic normal anion gap metabolic acidosis."
+      },
+      {
+        id: "bio_02",
+        subject: "Biochemistry",
+        lecture: "L1: Tubular Transporters & Acid-Base",
+        question: "In the proximal convoluted tubule, intracellular generation of bicarbonate from glutamine metabolism yields which critical urinary buffer excreted alongside H+?",
+        options: [
+          "Urea",
+          "Ammonium (NH4+)",
+          "Creatinine",
+          "Uric Acid",
+          "Beta-hydroxybutyrate"
+        ],
+        answer: 1,
+        explanation: "Renal ammoniagenesis occurs primarily in the PCT where glutamine is metabolized into 2 molecules of NH4+ and 2 molecules of alpha-ketoglutarate (which forms HCO3-). NH4+ is secreted into the lumen, serving as the major adaptive urinary buffer during metabolic acidosis."
+      },
+      {
+        id: "bio_03",
+        subject: "Biochemistry",
+        lecture: "L2: Renal Hormones & Vitamin D",
+        question: "Which enzyme in the proximal convoluted tubule converts 25-hydroxyvitamin D3 to its active hormonal form 1,25-dihydroxyvitamin D3, and what upregulates its activity?",
+        options: [
+          "24-hydroxylase; stimulated by high phosphate",
+          "1-alpha-hydroxylase; stimulated by Parathyroid Hormone (PTH)",
+          "25-hydroxylase; stimulated by Calcitonin",
+          "1-alpha-hydroxylase; stimulated by FGF-23",
+          "7-dehydrocholesterol reductase; stimulated by Calcium"
+        ],
+        answer: 1,
+        explanation: "1-alpha-hydroxylase in PCT epithelial cells converts inactive 25-OH D3 to active 1,25-(OH)2 D3 (calcitriol). Its gene transcription is strongly upregulated by Parathyroid Hormone (PTH) and low serum phosphate."
+      },
 
-    let currentQuestionIndex = 0;
+      // Physiology
+      {
+        id: "phys_01",
+        subject: "Physiology",
+        lecture: "L1: GFR & Hemodynamics",
+        question: "Selective constriction of the efferent arteriole by low-dose Angiotensin II produces which set of changes in Glomerular Filtration Rate (GFR), Renal Plasma Flow (RPF), and Filtration Fraction (FF)?",
+        options: [
+          "GFR increases, RPF decreases, FF increases",
+          "GFR decreases, RPF decreases, FF decreases",
+          "GFR increases, RPF increases, FF unchanged",
+          "GFR unchanged, RPF increases, FF decreases",
+          "GFR decreases, RPF increases, FF increases"
+        ],
+        answer: 0,
+        explanation: "Efferent arteriolar constriction increases glomerular hydrostatic pressure (P_gc), maintaining or elevating GFR while restricting renal blood flow (RPF decreases). Since FF = GFR / RPF, Filtration Fraction increases markedly."
+      },
+      {
+        id: "phys_02",
+        subject: "Physiology",
+        lecture: "L2: Countercurrent Multiplier System",
+        question: "Which segment of the nephron is completely impermeable to water regardless of Antidiuretic Hormone (ADH) concentrations, generating a hypotonic tubular fluid?",
+        options: [
+          "Descending limb of Henle",
+          "Thick ascending limb of Henle (TAL)",
+          "Cortical collecting duct",
+          "Proximal S1 segment",
+          "Inner medullary collecting duct"
+        ],
+        answer: 1,
+        explanation: "The Thick Ascending Limb (TAL) actively reabsorbs Na+, K+, and Cl- via NKCC2 but is strictly impermeable to water ('diluting segment'). This renders tubular fluid hypotonic relative to interstitium."
+      },
+      {
+        id: "phys_03",
+        subject: "Physiology",
+        lecture: "L2: Countercurrent Multiplier System",
+        question: "During severe dehydration, maximal urine concentration in the inner medulla relies on ADH-stimulated urea reabsorption via UT-A1 in which tubular segment?",
+        options: [
+          "Early distal convoluted tubule",
+          "Medullary collecting duct",
+          "Macula densa",
+          "Thin descending limb",
+          "Bowman's space"
+        ],
+        answer: 1,
+        explanation: "ADH upregulates UT-A1 urea transporters in the inner medullary collecting duct. Urea recycling into the deep medullary interstitium accounts for ~50% of the high corticomedullary osmotic gradient required for hypertonic urine production."
+      },
 
-    // Initialize Local Storage for Analytics
-    let stats = JSON.parse(localStorage.getItem("study_stats")) || {
-      total: 0,
-      correct: 0,
-      topics: {} // Stores { "Lecture Name": { attempted: 0, correct: 0 } }
+      // Anatomy
+      {
+        id: "anat_01",
+        subject: "Anatomy",
+        lecture: "L1: Renal Histology & Glomerular Architecture",
+        question: "The filtration barrier of the glomerulus consists of three distinct layers. Which of the following correctly orders these layers from capillary lumen to Bowman's space?",
+        options: [
+          "Podocyte slit diaphragms -> Glomerular Basement Membrane -> Fenestrated Endothelium",
+          "Fenestrated Endothelium -> Glomerular Basement Membrane -> Podocyte foot processes",
+          "Mesangium -> Tubular Basement Membrane -> Endothelial glycocalyx",
+          "Glomerular Basement Membrane -> Podocytes -> Parietal epithelial cells",
+          "Fenestrated Endothelium -> Mesangial Matrix -> Parietal cells"
+        ],
+        answer: 1,
+        explanation: "The glomerular filtration barrier proceeds from blood to filtrate: (1) Fenestrated capillary endothelium (lacks diaphragms), (2) Fusion-formed Glomerular Basement Membrane (type IV collagen & heparan sulfate), (3) Visceral epithelial cells (podocytes) with interdigitated pedicels and slit diaphragms."
+      },
+      {
+        id: "anat_02",
+        subject: "Anatomy",
+        lecture: "L2: Surgical & Gross Vascular Anatomy",
+        question: "During a donor nephrectomy, the surgeon notes that the left renal vein is significantly longer than the right renal vein. Which vein branches directly into the left renal vein before crossing anterior to the aorta?",
+        options: [
+          "Inferior phrenic vein and Left Gonadal (Testicular/Ovarian) vein",
+          "Right gonadal vein",
+          "Hepatic vein",
+          "Superior mesenteric vein",
+          "Middle colic vein"
+        ],
+        answer: 0,
+        explanation: "The left renal vein is longer because it crosses the midline anterior to the abdominal aorta (under the SMA). It receives tributary flow from the left adrenal/inferior phrenic vein superiorly and the left gonadal vein inferiorly."
+      },
+
+      // Pathology
+      {
+        id: "path_01",
+        subject: "Pathology",
+        lecture: "L1: Glomerular Diseases",
+        question: "A 7-year-old boy presents with facial edema and dark tea-colored urine 2 weeks following a streptococcal pharyngitis infection. Kidney biopsy under electron microscopy demonstrates large subepithelial 'humps'. What is the primary immunologic mechanism?",
+        options: [
+          "Anti-GBM antibodies binding Type IV collagen",
+          "Immune complex deposition (IgG, IgM, and C3) along basement membrane",
+          "Podocyte effacement driven by circulating cytokines",
+          "IgA immune complex deposition in the mesangium",
+          "ANCA-associated pauci-immune necrotizing vasculitis"
+        ],
+        answer: 1,
+        explanation: "Post-streptococcal glomerulonephritis (PSGN) is a Type III hypersensitivity reaction causing subepithelial immune complex 'humps' (IgG and C3). Biopsy exhibits starry-sky immunofluorescence and hypercellular glomeruli."
+      },
+      {
+        id: "path_02",
+        subject: "Pathology",
+        lecture: "L1: Glomerular Diseases",
+        question: "A 52-year-old male presents with heavy proteinuria (6.5 g/24hr), hyperlipidemia, and peripheral edema. Renal biopsy shows diffuse thickening of the GBM with 'spike and dome' appearance on silver stain. Antibodies against which antigen are most commonly identified?",
+        options: [
+          "Phospholipase A2 Receptor (PLA2R)",
+          "Goodpasture antigen (alpha-3 chain of Type IV collagen)",
+          "Proteinase 3 (PR3-ANCA)",
+          "Nephrin and Podocin",
+          "Uromodulin"
+        ],
+        answer: 0,
+        explanation: "Membranous nephropathy is the most common cause of primary nephrotic syndrome in adults. ~70-80% of primary cases are caused by autoantibodies targeting the M-type phospholipase A2 receptor (PLA2R) on podocytes."
+      },
+      {
+        id: "path_03",
+        subject: "Pathology",
+        lecture: "L2: Acute Kidney Injury & Tubulointerstitial Pathology",
+        question: "A 65-year-old hospitalized patient develops acute renal failure 48 hours after undergoing an emergency coronary angiogram with iodinated contrast. Urinalysis reveals muddy brown granular casts. What is the characteristic pathological finding?",
+        options: [
+          "Eosinophilic interstitial infiltrate",
+          "Necrosis of PCT and thick ascending limb epithelial cells with patchy basement membrane rupture",
+          "Granulomatous vasculitis of arcuate arteries",
+          "Diffuse crescent formation in >50% of glomeruli",
+          "Amyloid deposition with apple-green birefringence"
+        ],
+        answer: 1,
+        explanation: "Contrast-induced nephropathy causes ischemic Acute Tubular Necrosis (ATN). Pathologically, ATN manifests with patchy loss/necrosis of tubular epithelial cells in high-metabolic demand areas (PCT and TAL), shedding epithelial debris into lumen (muddy brown casts)."
+      },
+
+      // Pharmacology
+      {
+        id: "pharm_01",
+        subject: "Pharmacology",
+        lecture: "L1: Diuretics & Electrolyte Management",
+        question: "A patient with heart failure exacerbation receives IV furosemide. Which molecular target does furosemide inhibit, and in which nephron segment does it exert its major diuretic effect?",
+        options: [
+          "Na+/Cl- cotransporter in the early distal tubule",
+          "NKCC2 cotransporter in the thick ascending limb of Henle",
+          "Epithelial Sodium Channel (ENaC) in the cortical collecting duct",
+          "Carbonic anhydrase in the proximal convoluted tubule",
+          "Mineralocorticoid receptor in principal cells"
+        ],
+        answer: 1,
+        explanation: "Furosemide is a loop diuretic that reversibly inhibits the Na+/K+/2Cl- (NKCC2) cotransporter in the thick ascending limb of Henle's loop, disrupting the corticomedullary osmotic gradient."
+      },
+      {
+        id: "pharm_02",
+        subject: "Pharmacology",
+        lecture: "L1: Diuretics & Electrolyte Management",
+        question: "Which potassium-sparing diuretic directly blocks luminal Epithelial Sodium Channels (ENaC) in the late distal tubule and principal cells without binding aldosterone receptors?",
+        options: [
+          "Spironolactone",
+          "Amiloride",
+          "Eplerenone",
+          "Chlorthalidone",
+          "Acetazolamide"
+        ],
+        answer: 1,
+        explanation: "Amiloride and Triamterene are direct ENaC channel blockers in principal cells. Spironolactone and Eplerenone are competitive aldosterone receptor antagonists."
+      },
+      {
+        id: "pharm_03",
+        subject: "Pharmacology",
+        lecture: "L2: Antihypertensives & RAAS Blockade",
+        question: "Why are ACE inhibitors (e.g., Lisinopril) specifically indicated to slow diabetic nephropathy progression, despite causing a transient minor dip in GFR upon initiation?",
+        options: [
+          "They dilate afferent arterioles, raising intraglomerular pressure",
+          "They preferentially dilate efferent arterioles, reducing intraglomerular hydrostatic pressure and hyperfiltration",
+          "They induce tubular cell hypertrophy",
+          "They block aldosterone-mediated potassium excretion",
+          "They inhibit renal gluconeogenesis"
+        ],
+        answer: 1,
+        explanation: "ACE inhibitors inhibit Angiotensin II production, leading to efferent arteriolar vasodilation. This lowers intraglomerular pressure, reduces hyperfiltration injury, and decreases long-term proteinuria in diabetic kidney disease."
+      },
+
+      // Clinical
+      {
+        id: "clin_01",
+        subject: "Clinical",
+        lecture: "L1: Fluid, Electrolyte & Acid-Base Disorders",
+        question: "A 28-year-old female presents with severe lethargy and confusion after drinking 10 liters of water during a marathon. Serum Na+ is 114 mEq/L. Rapid correction with hypertonic saline risks inducing which catastrophic neurological complication?",
+        options: [
+          "Subarachnoid hemorrhage",
+          "Osmotic Demyelination Syndrome (Central Pontine Myelinolysis)",
+          "Wernicke Encephalopathy",
+          "Uncal herniation due to worsening edema",
+          "Normal pressure hydrocephalus"
+        ],
+        answer: 1,
+        explanation: "Overly rapid correction of chronic hyponatremia (>8-10 mEq/L in 24 hours) causes rapid neuronal shrinkage and oligodendrocyte injury, precipitating Osmotic Demyelination Syndrome (Central Pontine Myelinolysis)."
+      },
+      {
+        id: "clin_02",
+        subject: "Clinical",
+        lecture: "L2: Chronic Kidney Disease & Dialysis",
+        question: "In patients with Stage 5 Chronic Kidney Disease (CKD), persistent hyperphosphatemia drives secondary hyperparathyroidism. Which bone lesion is classic for end-stage renal osteodystrophy?",
+        options: [
+          "Osteitis fibrosa cystica (brown tumors)",
+          "Paget disease of bone",
+          "Avascular necrosis of the femoral head",
+          "Osteopetrosis",
+          "Osteosarcoma"
+        ],
+        answer: 0,
+        explanation: "Secondary hyperparathyroidism in CKD leads to high bone turnover, osteoclastic resorption, subperiosteal bone loss, and fibrous replacement of marrow with hemosiderin-laden brown tumors (Osteitis fibrosa cystica)."
+      }
+    ];
+
+    /* ==========================================================================
+       2. APPLICATION STATE MANAGEMENT
+       ========================================================================== */
+    const STATE = {
+      theme: localStorage.getItem('rqb_theme') || 'light',
+      activeTab: 'launcher',
+      
+      // Questions Bank
+      questions: JSON.parse(localStorage.getItem('rqb_questions')) || DEFAULT_QUESTIONS,
+      
+      // User History Map: { questionId: { status: 'correct'|'incorrect', userChoice: index, timestamp: date } }
+      userHistory: JSON.parse(localStorage.getItem('rqb_user_history')) || {},
+      
+      // Bookmarks Set: Array of IDs
+      bookmarks: JSON.parse(localStorage.getItem('rqb_bookmarks')) || [],
+      
+      // Active Quiz Session
+      session: {
+        active: false,
+        questions: [],
+        currentIndex: 0,
+        userAnswers: [], // Array of indices selected
+        struckOptions: {}, // { questionIndex: Set of struck choice indices }
+        mode: 'practice', // 'practice' | 'test'
+        timerSeconds: 0,
+        timerInterval: null,
+        submitted: false
+      },
+
+      // Review Filter
+      reviewFilter: 'all'
     };
 
-    function saveStats() {
-      localStorage.setItem("study_stats", JSON.stringify(stats));
+    /* ==========================================================================
+       3. INITIALIZATION & NAVIGATION
+       ========================================================================== */
+    window.onload = function() {
+      applyTheme(STATE.theme);
+      renderLauncherCategoryAccordions();
+      updateLauncherCounts();
+      updateBankStats();
+      updateAnalyticsView();
+
+      // Check if session stored or restore UI
+      switchTab('launcher');
+    };
+
+    function applyTheme(theme) {
+      STATE.theme = theme;
+      localStorage.setItem('rqb_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-icon').textContent = '🌙';
+      }
     }
 
-    // Tab Navigation
-    function switchTab(tabId) {
-      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
-      if (tabId === 'stats') renderStats();
+    function toggleTheme() {
+      applyTheme(STATE.theme === 'dark' ? 'light' : 'dark');
     }
 
-    // Load Quiz Question
-    function loadQuestion(index) {
-      const q = quizData[index];
-      document.getElementById("quiz-lecture-tag").innerText = q.lecture.toUpperCase();
-      document.getElementById("quiz-question").innerText = q.question;
-      document.getElementById("quiz-feedback").innerText = "";
-      document.getElementById("next-btn").style.display = "none";
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
 
-      const optionsDiv = document.getElementById("quiz-options");
-      optionsDiv.innerHTML = "";
+    function switchTab(tabName) {
+      STATE.activeTab = tabName;
 
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(idx, q.answer, q.lecture, btn);
-        optionsDiv.appendChild(btn);
+      // Update Nav Buttons
+      ['launcher', 'quiz', 'review', 'analytics', 'bank'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (!btn) return;
+        if (t === tabName) {
+          btn.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all bg-slate-800 text-white border border-slate-700 shadow-xs";
+        } else {
+          btn.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/50";
+        }
+
+        const page = document.getElementById(`page-${t}`);
+        if (page) {
+          page.classList.toggle('hidden', t !== tabName);
+        }
+      });
+
+      // Tab specific refresh actions
+      if (tabName === 'review') renderReviewPage();
+      if (tabName === 'analytics') updateAnalyticsView();
+      if (tabName === 'bank') updateBankStats();
+      if (tabName === 'launcher') updateLauncherCounts();
+    }
+
+    /* ==========================================================================
+       4. LAUNCHER PAGE ENGINE
+       ========================================================================== */
+    function getCategoriesAndLecturesMap() {
+      const map = {};
+      STATE.questions.forEach(q => {
+        const cat = q.subject || 'Uncategorized';
+        const lec = q.lecture || 'General Lecture';
+        if (!map[cat]) map[cat] = {};
+        if (!map[cat][lec]) map[cat][lec] = [];
+        map[cat][lec].push(q);
+      });
+      return map;
+    }
+
+    function renderLauncherCategoryAccordions() {
+      const container = document.getElementById('category-accordion-list');
+      container.innerHTML = '';
+      const map = getCategoriesAndLecturesMap();
+
+      Object.keys(map).forEach((catName, idx) => {
+        const lectures = map[catName];
+        let totalCatQuestions = 0;
+        Object.values(lectures).forEach(arr => totalCatQuestions += arr.length);
+
+        const card = document.createElement('div');
+        card.className = "border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/30 overflow-hidden transition-all";
+
+        card.innerHTML = `
+          <div class="p-4 flex items-center justify-between bg-white dark:bg-slate-900">
+            <div class="flex items-center space-x-3">
+              <input type="checkbox" id="cat-check-${idx}" checked onchange="toggleCategoryCheck(${idx})" class="category-checkbox w-5 h-5 text-brand-600 rounded focus:ring-brand-500 accent-brand-600 cursor-pointer">
+              <label for="cat-check-${idx}" class="font-bold text-slate-900 dark:text-white text-base cursor-pointer">${catName}</label>
+              <span class="bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 text-xs font-semibold px-3 py-1 rounded-full">
+                ${totalCatQuestions} Questions
+              </span>
+            </div>
+            <button type="button" onclick="toggleAccordion('cat-body-${idx}', 'cat-arrow-${idx}')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors">
+              <span>Lectures (${Object.keys(lectures).length})</span>
+              <span id="cat-arrow-${idx}">▼</span>
+            </button>
+          </div>
+
+          <div id="cat-body-${idx}" class="hidden p-4 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800 space-y-2">
+            ${Object.keys(lectures).map((lecName, lIdx) => `
+              <div class="flex items-center justify-between pl-4 pr-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                <label class="flex items-center space-x-2.5 cursor-pointer text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <input type="checkbox" data-cat="${catName}" data-lec="${lecName}" checked onchange="updateLauncherCounts()" class="lecture-checkbox w-4 h-4 text-brand-600 rounded accent-brand-600">
+                  <span>${lecName}</span>
+                </label>
+                <span class="text-xs font-mono text-slate-400 font-semibold">${lectures[lecName].length} Qs</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        container.appendChild(card);
       });
     }
 
-    // Handle Answer Submission & Record Stats
-    function checkAnswer(selected, correct, topic, button) {
-      const buttons = document.querySelectorAll(".option-btn");
-      buttons.forEach(btn => btn.disabled = true);
-
-      if (!stats.topics[topic]) {
-        stats.topics[topic] = { attempted: 0, correct: 0 };
-      }
-
-      stats.total++;
-      stats.topics[topic].attempted++;
-
-      if (selected === correct) {
-        button.classList.add("correct");
-        document.getElementById("quiz-feedback").innerText = "✨ Correct!";
-        document.getElementById("quiz-feedback").style.color = "var(--success)";
-        stats.correct++;
-        stats.topics[topic].correct++;
+    function toggleAccordion(bodyId, arrowId) {
+      const body = document.getElementById(bodyId);
+      const arrow = document.getElementById(arrowId);
+      if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        arrow.textContent = '▲';
       } else {
-        button.classList.add("incorrect");
-        buttons[correct].classList.add("correct");
-        document.getElementById("quiz-feedback").innerText = "❌ Incorrect. See correct answer above.";
-        document.getElementById("quiz-feedback").style.color = "var(--danger)";
+        body.classList.add('hidden');
+        arrow.textContent = '▼';
       }
-
-      saveStats();
-      document.getElementById("next-btn").style.display = "inline-block";
     }
 
-    function loadNextQuestion() {
-      currentQuestionIndex = (currentQuestionIndex + 1) % quizData.length;
-      loadQuestion(currentQuestionIndex);
+    function toggleCategoryCheck(catIdx) {
+      const catCheck = document.getElementById(`cat-check-${catIdx}`);
+      const body = document.getElementById(`cat-body-${catIdx}`);
+      if (body) {
+        const checkboxes = body.querySelectorAll('.lecture-checkbox');
+        checkboxes.forEach(cb => cb.checked = catCheck.checked);
+      }
+      updateLauncherCounts();
     }
 
-    // Change PDF Slide
-    function changeSlide() {
-      const pdfUrl = document.getElementById("slide-select").value;
-      document.getElementById("pdf-viewer").src = pdfUrl;
+    function selectAllCategories(state) {
+      document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = state);
+      document.querySelectorAll('.lecture-checkbox').forEach(cb => cb.checked = state);
+      updateLauncherCounts();
     }
 
-    // Render Stats & Weak Areas
-    function renderStats() {
-      document.getElementById("stat-total").innerText = stats.total;
-      const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-      document.getElementById("stat-accuracy").innerText = `${acc}%`;
+    function getSelectedQuestionsForLauncher() {
+      const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || 'all';
+      const lectureCheckboxes = document.querySelectorAll('.lecture-checkbox:checked');
+      
+      const selectedLecturesSet = new Set();
+      lectureCheckboxes.forEach(cb => {
+        selectedLecturesSet.add(`${cb.dataset.cat}||${cb.dataset.lec}`);
+      });
 
-      const breakdownDiv = document.getElementById("topic-breakdown");
-      breakdownDiv.innerHTML = "";
+      return STATE.questions.filter(q => {
+        const key = `${q.subject || 'Uncategorized'}||${q.lecture || 'General Lecture'}`;
+        if (!selectedLecturesSet.has(key)) return false;
 
-      if (Object.keys(stats.topics).length === 0) {
-        breakdownDiv.innerText = "No quizzes completed yet.";
+        const hist = STATE.userHistory[q.id];
+        const isBookmarked = STATE.bookmarks.includes(q.id);
+
+        if (statusFilter === 'unused') return !hist;
+        if (statusFilter === 'incorrect') return hist && hist.status === 'incorrect';
+        if (statusFilter === 'correct') return hist && hist.status === 'correct';
+        if (statusFilter === 'bookmarked') return isBookmarked;
+        return true; // 'all'
+      });
+    }
+
+    function updateLauncherCounts() {
+      const eligibleQuestions = getSelectedQuestionsForLauncher();
+      const label = document.getElementById('available-questions-label');
+      if (label) {
+        label.textContent = `Available Matching Questions: ${eligibleQuestions.length}`;
+      }
+    }
+
+    /* ==========================================================================
+       5. QUIZ ENGINE & SESSION HANDLER
+       ========================================================================== */
+    function startQuizSession() {
+      let pool = getSelectedQuestionsForLauncher();
+      if (pool.length === 0) {
+        alert('No questions match your current category, lecture, and status filter selection!');
         return;
       }
 
-      for (const [topic, data] of Object.entries(stats.topics)) {
-        const topicAcc = Math.round((data.correct / data.attempted) * 100);
-        const statusColor = topicAcc < 70 ? "var(--danger)" : "var(--success)";
+      const countInput = parseInt(document.getElementById('question-count-input').value) || 10;
+      const randomizeQ = document.getElementById('randomize-questions').checked;
+      const randomizeC = document.getElementById('randomize-choices').checked;
+      const mode = document.getElementById('quiz-mode-select').value;
+
+      if (randomizeQ) {
+        pool = [...pool].sort(() => Math.random() - 0.5);
+      }
+
+      const selectedQuestions = pool.slice(0, Math.min(countInput, pool.length));
+
+      // Prepare Session object
+      const processedQuestions = selectedQuestions.map(q => {
+        let opts = [...q.options];
+        let correctIdx = q.answer;
+
+        // If answer is letter e.g. "A", convert to index
+        if (typeof correctIdx === 'string') {
+          const letter = correctIdx.trim().toUpperCase();
+          if (['A','B','C','D','E'].includes(letter)) {
+            correctIdx = letter.charCodeAt(0) - 65;
+          } else {
+            correctIdx = opts.findIndex(o => o.trim() === correctIdx.trim());
+          }
+        }
+
+        if (randomizeC) {
+          const correctObj = opts[correctIdx];
+          opts = [...opts].sort(() => Math.random() - 0.5);
+          correctIdx = opts.indexOf(correctObj);
+        }
+
+        return {
+          ...q,
+          options: opts,
+          answerIndex: correctIdx
+        };
+      });
+
+      // Clear existing timer
+      if (STATE.session.timerInterval) clearInterval(STATE.session.timerInterval);
+
+      STATE.session = {
+        active: true,
+        questions: processedQuestions,
+        currentIndex: 0,
+        userAnswers: new Array(processedQuestions.length).fill(null),
+        struckOptions: {},
+        mode: mode,
+        timerSeconds: 0,
+        timerInterval: setInterval(() => {
+          STATE.session.timerSeconds++;
+          updateTimerDisplay();
+        }, 1000),
+        submitted: false
+      };
+
+      // Show quiz tab & active view
+      document.getElementById('quiz-empty-state').classList.add('hidden');
+      document.getElementById('quiz-active-container').classList.remove('hidden');
+      document.getElementById('active-quiz-badge').classList.remove('hidden');
+
+      switchTab('quiz');
+      renderCurrentQuestion();
+    }
+
+    function updateTimerDisplay() {
+      const sec = STATE.session.timerSeconds;
+      const mins = Math.floor(sec / 60).toString().padStart(2, '0');
+      const secs = (sec % 60).toString().padStart(2, '0');
+      const timerEl = document.getElementById('quiz-timer');
+      if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+    }
+
+    function renderCurrentQuestion() {
+      const sess = STATE.session;
+      const q = sess.questions[sess.currentIndex];
+      if (!q) return;
+
+      // Update Header Badges
+      const modeTag = document.getElementById('quiz-mode-tag');
+      modeTag.textContent = sess.mode === 'practice' ? 'Practice Mode' : 'Test Mode';
+      modeTag.className = sess.mode === 'practice' 
+        ? "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300"
+        : "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300";
+
+      document.getElementById('quiz-progress-text').textContent = `Question ${sess.currentIndex + 1} of ${sess.questions.length}`;
+      
+      const pct = ((sess.currentIndex + 1) / sess.questions.length) * 100;
+      document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+
+      // Update Bookmark button state
+      updateBookmarkBtnUI(q.id);
+
+      // Question Stems & Metadata
+      document.getElementById('q-subject-badge').textContent = q.subject || 'General';
+      document.getElementById('q-lecture-badge').textContent = q.lecture || 'Lecture';
+      document.getElementById('q-stem').textContent = q.question;
+
+      // Render Choice Options
+      const optionsContainer = document.getElementById('q-options');
+      optionsContainer.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      const userChoice = sess.userAnswers[sess.currentIndex];
+      const isStruckSet = sess.struckOptions[sess.currentIndex] || new Set();
+
+      q.options.forEach((optText, optIdx) => {
+        const optionBtn = document.createElement('div');
+        let cardStyle = "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500";
+        let letterStyle = "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
+        let badgeIcon = "";
+
+        // Practice Mode Instant Highlight or Test Submitted Highlight
+        if (sess.mode === 'practice' && userChoice !== null) {
+          if (optIdx === q.answerIndex) {
+            cardStyle = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 font-semibold";
+            letterStyle = "bg-emerald-600 text-white font-bold";
+            badgeIcon = '<span class="ml-auto text-emerald-600 font-bold">✓ Correct</span>';
+          } else if (optIdx === userChoice) {
+            cardStyle = "border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100 font-semibold";
+            letterStyle = "bg-rose-600 text-white font-bold";
+            badgeIcon = '<span class="ml-auto text-rose-600 font-bold">✕ Incorrect</span>';
+          }
+        } else if (sess.mode === 'test' && sess.submitted) {
+          if (optIdx === q.answerIndex) {
+            cardStyle = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 font-semibold";
+            letterStyle = "bg-emerald-600 text-white font-bold";
+            badgeIcon = '<span class="ml-auto text-emerald-600 font-bold">✓ Correct</span>';
+          } else if (optIdx === userChoice) {
+            cardStyle = "border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100 font-semibold";
+            letterStyle = "bg-rose-600 text-white font-bold";
+            badgeIcon = '<span class="ml-auto text-rose-600 font-bold">✕ Your Choice</span>';
+          }
+        } else if (userChoice === optIdx) {
+          cardStyle = "border-brand-600 bg-brand-50 dark:bg-brand-950/40 text-brand-900 dark:text-brand-100 font-semibold ring-2 ring-brand-500/20";
+          letterStyle = "bg-brand-600 text-white font-bold";
+        }
+
+        const isStruck = isStruckSet.has(optIdx);
+
+        optionBtn.className = `p-4 rounded-2xl border flex items-center space-x-3 cursor-pointer transition-all ${cardStyle} ${isStruck ? 'strikethrough-option' : ''}`;
         
-        const topicEl = document.createElement("div");
-        topicEl.style.margin = "0.75rem 0";
-        topicEl.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom: 0.25rem;">
-            <span><strong>${topic}</strong> (${data.correct}/${data.attempted})</span>
-            <span style="color: ${statusColor}; font-weight: bold;">${topicAcc}% Accuracy ${topicAcc < 70 ? '⚠️ Needs Review' : '✅ Mastered'}</span>
+        optionBtn.onclick = () => selectOption(optIdx);
+        optionBtn.oncontextmenu = (e) => {
+          e.preventDefault();
+          toggleStrikeOption(optIdx);
+        };
+
+        optionBtn.innerHTML = `
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${letterStyle}">
+            ${letters[optIdx] || optIdx + 1}
+          </div>
+          <div class="text-sm sm:text-base font-medium leading-normal flex-grow">${optText}</div>
+          ${badgeIcon}
+        `;
+
+        optionsContainer.appendChild(optionBtn);
+      });
+
+      // Explanation Box display
+      const expBox = document.getElementById('q-explanation-box');
+      const expTitle = document.getElementById('explanation-status-title');
+      const expIcon = document.getElementById('explanation-status-icon');
+      const expText = document.getElementById('explanation-text');
+
+      if ((sess.mode === 'practice' && userChoice !== null) || sess.submitted) {
+        expBox.classList.remove('hidden');
+        expText.textContent = q.explanation || 'No explanation provided.';
+
+        if (userChoice === q.answerIndex) {
+          expBox.className = "rounded-2xl p-5 border transition-all space-y-2 bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100";
+          expTitle.textContent = "Correct Rationale";
+          expIcon.textContent = "✅";
+        } else {
+          expBox.className = "rounded-2xl p-5 border transition-all space-y-2 bg-rose-50/80 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-100";
+          expTitle.textContent = "Incorrect - Learning Rationale";
+          expIcon.textContent = "💡";
+        }
+      } else {
+        expBox.classList.add('hidden');
+      }
+
+      // Prev / Next Button Controls
+      document.getElementById('btn-prev').disabled = sess.currentIndex === 0;
+
+      const btnNext = document.getElementById('btn-next');
+      const btnSubmit = document.getElementById('btn-submit-exam');
+
+      if (sess.currentIndex === sess.questions.length - 1) {
+        if (sess.mode === 'test' && !sess.submitted) {
+          btnNext.classList.add('hidden');
+          btnSubmit.classList.remove('hidden');
+        } else {
+          btnNext.textContent = 'Finish Quiz ✓';
+          btnNext.classList.remove('hidden');
+          btnSubmit.classList.add('hidden');
+        }
+      } else {
+        btnNext.textContent = 'Next →';
+        btnNext.classList.remove('hidden');
+        btnSubmit.classList.add('hidden');
+      }
+    }
+
+    function selectOption(optIdx) {
+      const sess = STATE.session;
+      if (sess.submitted && sess.mode === 'test') return;
+      
+      // Allow re-selection in Practice Mode if desired or lock once answered
+      sess.userAnswers[sess.currentIndex] = optIdx;
+
+      const q = sess.questions[sess.currentIndex];
+      const isCorrect = optIdx === q.answerIndex;
+
+      // Update Local History
+      STATE.userHistory[q.id] = {
+        status: isCorrect ? 'correct' : 'incorrect',
+        userChoice: optIdx,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('rqb_user_history', JSON.stringify(STATE.userHistory));
+
+      renderCurrentQuestion();
+    }
+
+    function toggleStrikeOption(optIdx) {
+      const sess = STATE.session;
+      if (!sess.struckOptions[sess.currentIndex]) {
+        sess.struckOptions[sess.currentIndex] = new Set();
+      }
+      const set = sess.struckOptions[sess.currentIndex];
+      if (set.has(optIdx)) set.delete(optIdx);
+      else set.add(optIdx);
+
+      renderCurrentQuestion();
+    }
+
+    function navigateQuiz(dir) {
+      const sess = STATE.session;
+      const target = sess.currentIndex + dir;
+
+      if (target >= 0 && target < sess.questions.length) {
+        sess.currentIndex = target;
+        renderCurrentQuestion();
+      } else if (target >= sess.questions.length) {
+        finishQuiz();
+      }
+    }
+
+    function submitExam() {
+      const sess = STATE.session;
+      const unanswered = sess.userAnswers.filter(a => a === null).length;
+      
+      if (unanswered > 0) {
+        if (!confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit the exam now?`)) {
+          return;
+        }
+      }
+      
+      sess.submitted = true;
+      if (sess.timerInterval) clearInterval(sess.timerInterval);
+      renderCurrentQuestion();
+      alert('Exam submitted successfully! You can now review explanations for each question.');
+    }
+
+    function finishQuiz() {
+      if (STATE.session.timerInterval) clearInterval(STATE.session.timerInterval);
+      document.getElementById('active-quiz-badge').classList.add('hidden');
+      switchTab('review');
+    }
+
+    function toggleCurrentBookmark() {
+      const sess = STATE.session;
+      const q = sess.questions[sess.currentIndex];
+      if (!q) return;
+
+      const idx = STATE.bookmarks.indexOf(q.id);
+      if (idx > -1) {
+        STATE.bookmarks.splice(idx, 1);
+      } else {
+        STATE.bookmarks.push(q.id);
+      }
+      localStorage.setItem('rqb_bookmarks', JSON.stringify(STATE.bookmarks));
+      updateBookmarkBtnUI(q.id);
+    }
+
+    function updateBookmarkBtnUI(qId) {
+      const isBookmarked = STATE.bookmarks.includes(qId);
+      const btn = document.getElementById('bookmark-btn');
+      const star = document.getElementById('bookmark-star');
+
+      if (isBookmarked) {
+        btn.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400";
+        star.textContent = '★';
+      } else {
+        btn.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
+        star.textContent = '☆';
+      }
+    }
+
+    /* Jump Grid Modal */
+    function toggleGridModal() {
+      const modal = document.getElementById('grid-modal');
+      modal.classList.toggle('hidden');
+
+      if (!modal.classList.contains('hidden')) {
+        const container = document.getElementById('grid-buttons-container');
+        container.innerHTML = '';
+        const sess = STATE.session;
+
+        sess.questions.forEach((q, idx) => {
+          const btn = document.createElement('button');
+          const answered = sess.userAnswers[idx] !== null;
+          const isCurrent = idx === sess.currentIndex;
+
+          let colorClass = "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
+          if (isCurrent) colorClass = "ring-2 ring-brand-500 bg-brand-600 text-white font-bold";
+          else if (answered) colorClass = "bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 font-semibold";
+
+          btn.className = `p-2.5 rounded-xl text-xs font-medium text-center transition-all ${colorClass}`;
+          btn.textContent = idx + 1;
+          btn.onclick = () => {
+            sess.currentIndex = idx;
+            renderCurrentQuestion();
+            toggleGridModal();
+          };
+          container.appendChild(btn);
+        });
+      }
+    }
+
+    /* ==========================================================================
+       6. REVIEW PAGE ENGINE
+       ========================================================================== */
+    function filterReview(filterType) {
+      STATE.reviewFilter = filterType;
+      
+      const buttons = ['all', 'incorrect', 'correct', 'bookmarked'];
+      buttons.forEach(f => {
+        const btn = document.getElementById(`rev-filter-${f}`);
+        if (!btn) return;
+        if (f === filterType) {
+          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-brand-500 bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300";
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
+        }
+      });
+
+      renderReviewPage();
+    }
+
+    function renderReviewPage() {
+      const container = document.getElementById('review-items-container');
+      container.innerHTML = '';
+
+      // Count Badges
+      let countAll = 0, countInc = 0, countCor = 0, countBm = STATE.bookmarks.length;
+
+      const attemptedQuestions = STATE.questions.filter(q => {
+        const hist = STATE.userHistory[q.id];
+        if (hist) {
+          countAll++;
+          if (hist.status === 'correct') countCor++;
+          if (hist.status === 'incorrect') countInc++;
+          return true;
+        }
+        return false;
+      });
+
+      document.getElementById('rev-count-all').textContent = countAll;
+      document.getElementById('rev-count-incorrect').textContent = countInc;
+      document.getElementById('rev-count-correct').textContent = countCor;
+      document.getElementById('rev-count-bookmarked').textContent = countBm;
+
+      const filter = STATE.reviewFilter;
+      let displayList = [];
+
+      if (filter === 'bookmarked') {
+        displayList = STATE.questions.filter(q => STATE.bookmarks.includes(q.id));
+      } else {
+        displayList = attemptedQuestions.filter(q => {
+          const hist = STATE.userHistory[q.id];
+          if (filter === 'incorrect') return hist.status === 'incorrect';
+          if (filter === 'correct') return hist.status === 'correct';
+          return true;
+        });
+      }
+
+      if (displayList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 space-y-2">
+            <div class="text-3xl">📝</div>
+            <p class="font-medium text-sm">No questions found matching this review filter.</p>
           </div>
         `;
-        breakdownDiv.appendChild(topicEl);
+        return;
+      }
+
+      displayList.forEach((q, idx) => {
+        const hist = STATE.userHistory[q.id];
+        const isBm = STATE.bookmarks.includes(q.id);
+
+        let statusBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">Unanswered</span>`;
+        if (hist) {
+          statusBadge = hist.status === 'correct'
+            ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">✓ Correct</span>`
+            : `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">✕ Incorrect</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = "border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 rounded-2xl p-5 space-y-4 transition-all";
+
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              ${statusBadge}
+              <span class="text-xs font-medium text-slate-500">${q.subject || 'Subject'} &bull; ${q.lecture || 'Lecture'}</span>
+            </div>
+            <button onclick="toggleBookmarkInReview('${q.id}')" class="text-xs font-bold text-slate-500 hover:text-amber-500 flex items-center space-x-1">
+              <span>${isBm ? '★ Bookmarked' : '☆ Bookmark'}</span>
+            </button>
+          </div>
+
+          <p class="font-semibold text-slate-900 dark:text-slate-100 text-sm sm:text-base">${idx + 1}. ${q.question}</p>
+
+          <div class="space-y-2 text-xs sm:text-sm">
+            ${q.options.map((optText, oIdx) => {
+              let style = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300";
+              let badge = "";
+
+              let correctIdx = q.answer;
+              if (typeof correctIdx === 'string') {
+                const letter = correctIdx.trim().toUpperCase();
+                if (['A','B','C','D','E'].includes(letter)) correctIdx = letter.charCodeAt(0) - 65;
+                else correctIdx = q.options.findIndex(o => o.trim() === correctIdx.trim());
+              }
+
+              if (oIdx === correctIdx) {
+                style = "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-400 text-emerald-900 dark:text-emerald-100 font-medium";
+                badge = '<span class="ml-auto font-bold text-emerald-600">Correct Answer</span>';
+              } else if (hist && hist.userChoice === oIdx) {
+                style = "bg-rose-50 dark:bg-rose-950/50 border-rose-400 text-rose-900 dark:text-rose-100 font-medium";
+                badge = '<span class="ml-auto font-bold text-rose-600">Your Selection</span>';
+              }
+
+              return `
+                <div class="p-3 rounded-xl border flex items-center justify-between ${style}">
+                  <span>${String.fromCharCode(65 + oIdx)}. ${optText}</span>
+                  ${badge}
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="bg-blue-50/70 dark:bg-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-800 text-xs sm:text-sm space-y-1">
+            <span class="font-bold text-brand-700 dark:text-brand-300 block">Explanation & Rationale:</span>
+            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">${q.explanation || 'N/A'}</p>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function toggleBookmarkInReview(qId) {
+      const idx = STATE.bookmarks.indexOf(qId);
+      if (idx > -1) STATE.bookmarks.splice(idx, 1);
+      else STATE.bookmarks.push(qId);
+      localStorage.setItem('rqb_bookmarks', JSON.stringify(STATE.bookmarks));
+      renderReviewPage();
+    }
+
+    /* ==========================================================================
+       7. ANALYTICS & DASHBOARD ENGINE
+       ========================================================================== */
+    function updateAnalyticsView() {
+      const historyKeys = Object.keys(STATE.userHistory);
+      const totalCompleted = historyKeys.length;
+
+      let correctCount = 0;
+      historyKeys.forEach(k => {
+        if (STATE.userHistory[k].status === 'correct') correctCount++;
+      });
+
+      const accuracyPct = totalCompleted > 0 ? Math.round((correctCount / totalCompleted) * 100) : 0;
+      const totalBankQs = STATE.questions.length;
+      const coveragePct = totalBankQs > 0 ? Math.round((totalCompleted / totalBankQs) * 100) : 0;
+
+      document.getElementById('kpi-total-completed').textContent = totalCompleted;
+      document.getElementById('kpi-accuracy').textContent = `${accuracyPct}%`;
+      document.getElementById('kpi-bookmarks').textContent = STATE.bookmarks.length;
+      document.getElementById('kpi-coverage').textContent = `${coveragePct}%`;
+
+      // Subject Breakdown Analysis
+      const subjectMap = {};
+      STATE.questions.forEach(q => {
+        const sub = q.subject || 'General';
+        if (!subjectMap[sub]) subjectMap[sub] = { totalAttempts: 0, correctAttempts: 0, questionCount: 0 };
+        subjectMap[sub].questionCount++;
+        
+        const hist = STATE.userHistory[q.id];
+        if (hist) {
+          subjectMap[sub].totalAttempts++;
+          if (hist.status === 'correct') subjectMap[sub].correctAttempts++;
+        }
+      });
+
+      const barsContainer = document.getElementById('analytics-subject-bars');
+      barsContainer.innerHTML = '';
+
+      const weakTopics = [];
+
+      Object.keys(subjectMap).forEach(sub => {
+        const data = subjectMap[sub];
+        const subAcc = data.totalAttempts > 0 ? Math.round((data.correctAttempts / data.totalAttempts) * 100) : 0;
+
+        if (data.totalAttempts > 0 && subAcc < 70) {
+          weakTopics.push({ subject: sub, accuracy: subAcc });
+        }
+
+        let barColor = "bg-rose-500";
+        if (subAcc >= 75) barColor = "bg-emerald-500";
+        else if (subAcc >= 60) barColor = "bg-amber-500";
+
+        const barRow = document.createElement('div');
+        barRow.className = "space-y-1.5";
+        barRow.innerHTML = `
+          <div class="flex justify-between items-center text-xs sm:text-sm font-semibold">
+            <span class="text-slate-800 dark:text-slate-200">${sub} (${data.totalAttempts}/${data.questionCount} Qs attempted)</span>
+            <span class="font-mono text-slate-700 dark:text-slate-300">${subAcc}% Accuracy</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+            <div class="${barColor} h-full transition-all duration-500" style="width: ${data.totalAttempts === 0 ? 0 : subAcc}%"></div>
+          </div>
+        `;
+
+        barsContainer.appendChild(barRow);
+      });
+
+      // Smart Recommendations Engine
+      const recContainer = document.getElementById('smart-recommendations-content');
+      recContainer.innerHTML = '';
+
+      if (totalCompleted === 0) {
+        recContainer.innerHTML = `<p class="italic text-slate-500">Complete your first study session to receive targeted high-yield AI recommendations!</p>`;
+      } else if (weakTopics.length === 0) {
+        recContainer.innerHTML = `
+          <p class="text-emerald-700 dark:text-emerald-300 font-semibold">🌟 Excellent performance! All attempted subjects are above 70% accuracy.</p>
+          <p class="text-xs text-slate-500">Continue taking new unused questions to maintain high retention before exam day.</p>
+        `;
+      } else {
+        recContainer.innerHTML = `
+          <p class="font-semibold text-rose-700 dark:text-rose-300">Focus Priority Detected:</p>
+          <ul class="list-disc pl-5 space-y-1 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+            ${weakTopics.map(w => `
+              <li><strong>${w.subject}:</strong> Current accuracy is ${w.accuracy}%. Launch a targeted quiz with "Incorrect Only" status filter.</li>
+            `).join('')}
+          </ul>
+        `;
       }
     }
 
-    function resetStats() {
-      if (confirm("Reset all quiz analytics?")) {
-        localStorage.removeItem("study_stats");
-        stats = { total: 0, correct: 0, topics: {} };
-        renderStats();
+    /* ==========================================================================
+       8. QUESTION BANK & DATASET MANAGER
+       ========================================================================== */
+    function updateBankStats() {
+      document.getElementById('bank-stat-total').textContent = STATE.questions.length;
+      
+      const map = getCategoriesAndLecturesMap();
+      const catCount = Object.keys(map).length;
+      let lecCount = 0;
+
+      Object.values(map).forEach(lMap => lecCount += Object.keys(lMap).length);
+
+      document.getElementById('bank-stat-categories').textContent = catCount;
+      document.getElementById('bank-stat-lectures').textContent = lecCount;
+    }
+
+    function handleFileUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      let importedCount = 0;
+      let readCount = 0;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed)) {
+              STATE.questions = [...STATE.questions, ...parsed];
+              importedCount += parsed.length;
+            } else if (typeof parsed === 'object') {
+              STATE.questions.push(parsed);
+              importedCount++;
+            }
+          } catch (err) {
+            alert(`Error parsing JSON file ${file.name}: ${err.message}`);
+          }
+
+          readCount++;
+          if (readCount === files.length) {
+            saveQuestions();
+            alert(`Successfully imported ${importedCount} questions from ${files.length} file(s)!`);
+            renderLauncherCategoryAccordions();
+            updateBankStats();
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function handleJSONPaste() {
+      const text = document.getElementById('json-paste-area').value.trim();
+      if (!text) return;
+
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          STATE.questions = [...STATE.questions, ...parsed];
+          saveQuestions();
+          alert(`Successfully imported ${parsed.length} pasted questions!`);
+        } else {
+          STATE.questions.push(parsed);
+          saveQuestions();
+          alert('Successfully imported 1 pasted question!');
+        }
+        document.getElementById('json-paste-area').value = '';
+        renderLauncherCategoryAccordions();
+        updateBankStats();
+      } catch (err) {
+        alert('Invalid JSON syntax! Please check formatting and retry.');
       }
     }
 
-    // Initialize First Question
-    loadQuestion(0);
+    function saveQuestions() {
+      localStorage.setItem('rqb_questions', JSON.stringify(STATE.questions));
+    }
+
+    function loadDefaultDataset() {
+      if (confirm('Reset question bank to the default Renal & Clinical Medical Dataset?')) {
+        STATE.questions = DEFAULT_QUESTIONS;
+        saveQuestions();
+        renderLauncherCategoryAccordions();
+        updateBankStats();
+        alert('Bank reset to pre-loaded dataset!');
+      }
+    }
+
+    function clearHistory() {
+      if (confirm('Are you sure you want to erase all user answer history and bookmarks?')) {
+        STATE.userHistory = {};
+        STATE.bookmarks = [];
+        localStorage.removeItem('rqb_user_history');
+        localStorage.removeItem('rqb_bookmarks');
+        updateAnalyticsView();
+        updateLauncherCounts();
+        alert('All progress history has been cleared.');
+      }
+    }
+
+    function exportUserData() {
+      const payload = {
+        questions: STATE.questions,
+        userHistory: STATE.userHistory,
+        bookmarks: STATE.bookmarks,
+        exportDate: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `renal_quiz_bank_backup_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>

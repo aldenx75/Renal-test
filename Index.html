@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Hub & Quiz Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: #020617;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    nav button {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      font-weight: bold;
+    }
+    nav button.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    
+    /* Card Styles */
+    .card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border: 1px solid #334155;
+    }
+    
+    /* Quiz Options */
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #334155;
+      color: var(--text);
+      border: none;
+      padding: 0.8rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .option-btn:hover { background: #475569; }
+    .option-btn.correct { background: var(--success) !important; color: white; }
+    .option-btn.incorrect { background: var(--danger) !important; color: white; }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .stat-box {
+      background: #020617;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    
+    /* PDF Viewer */
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>⚡ Study Hub</h2>
+    <nav>
+      <button class="active" onclick="switchTab('quiz')">Quizzes</button>
+      <button onclick="switchTab('slides')">Slides</button>
+      <button onclick="switchTab('stats')">Analytics</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- QUIZ VIEW -->
+    <div id="quiz" class="view active">
+      <div class="card">
+        <span id="quiz-lecture-tag" style="color: var(--accent); font-weight: bold; font-size: 0.85rem;"></span>
+        <h3 id="quiz-question">Loading Question...</h3>
+        <div id="quiz-options"></div>
+        <p id="quiz-feedback" style="font-weight: bold; margin-top: 1rem;"></p>
+        <button id="next-btn" style="display:none; padding: 0.5rem 1rem; background: var(--accent); border:none; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="loadNextQuestion()">Next Question</button>
+      </div>
+    </div>
+
+    <!-- SLIDES VIEW -->
+    <div id="slides" class="view">
+      <div class="card">
+        <h3>Lecture Slides</h3>
+        <select id="slide-select" onchange="changeSlide()" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: #334155; color: white; border: none; border-radius: 4px;">
+          <option value="slides/lecture1.pdf">Lecture 1: Introduction</option>
+          <option value="slides/lecture2.pdf">Lecture 2: Advanced Topics</option>
+        </select>
+        <iframe id="pdf-viewer" src="slides/lecture1.pdf"></iframe>
+      </div>
+    </div>
+
+    <!-- STATS VIEW -->
+    <div id="stats" class="view">
+      <div class="card">
+        <h3>Performance Summary</h3>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div id="stat-total" class="stat-number">0</div>
+            <div>Questions Completed</div>
+          </div>
+          <div class="stat-box">
+            <div id="stat-accuracy" class="stat-number">0%</div>
+            <div>Overall Accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Performance by Lecture Topic</h3>
+        <div id="topic-breakdown">No data recorded yet.</div>
+      </div>
+      <button onclick="resetStats()" style="background: var(--danger); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Reset Analytics Data</button>
+    </div>
+  </main>
+
+  <script>
+    // --- 1. NOTEBOOK LM QUIZ DATA ---
+    // Copy-paste quiz questions exported from NotebookLM here:
+    const quizData = [
+      {
+        lecture: "Lecture 1: Introduction",
+        question: "What is the primary function of local storage in a web browser?",
+        options: ["Store data permanently across sessions on client-side", "Execute backend server code", "Encrypt network connections", "Style web pages dynamically"],
+        answer: 0
+      },
+      {
+        lecture: "Lecture 1: Introduction",
+        question: "Which HTML tag is commonly used to embed external PDF documents?",
+        options: ["<script>", "<embed>", "<link>", "<style>"],
+        answer: 1
+      },
+      {
+        lecture: "Lecture 2: Advanced Topics",
+        question: "What format is best for structuring NotebookLM exported quiz data for JS?",
+        options: ["XML", "JSON", "CSV", "Markdown"],
+        answer: 1
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+
+    // Initialize Local Storage for Analytics
+    let stats = JSON.parse(localStorage.getItem("study_stats")) || {
+      total: 0,
+      correct: 0,
+      topics: {} // Stores { "Lecture Name": { attempted: 0, correct: 0 } }
+    };
+
+    function saveStats() {
+      localStorage.setItem("study_stats", JSON.stringify(stats));
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+      if (tabId === 'stats') renderStats();
+    }
+
+    // Load Quiz Question
+    function loadQuestion(index) {
+      const q = quizData[index];
+      document.getElementById("quiz-lecture-tag").innerText = q.lecture.toUpperCase();
+      document.getElementById("quiz-question").innerText = q.question;
+      document.getElementById("quiz-feedback").innerText = "";
+      document.getElementById("next-btn").style.display = "none";
+
+      const optionsDiv = document.getElementById("quiz-options");
+      optionsDiv.innerHTML = "";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(idx, q.answer, q.lecture, btn);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    // Handle Answer Submission & Record Stats
+    function checkAnswer(selected, correct, topic, button) {
+      const buttons = document.querySelectorAll(".option-btn");
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (!stats.topics[topic]) {
+        stats.topics[topic] = { attempted: 0, correct: 0 };
+      }
+
+      stats.total++;
+      stats.topics[topic].attempted++;
+
+      if (selected === correct) {
+        button.classList.add("correct");
+        document.getElementById("quiz-feedback").innerText = "✨ Correct!";
+        document.getElementById("quiz-feedback").style.color = "var(--success)";
+        stats.correct++;
+        stats.topics[topic].correct++;
+      } else {
+        button.classList.add("incorrect");
+        buttons[correct].classList.add("correct");
+        document.getElementById("quiz-feedback").innerText = "❌ Incorrect. See correct answer above.";
+        document.getElementById("quiz-feedback").style.color = "var(--danger)";
+      }
+
+      saveStats();
+      document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    function loadNextQuestion() {
+      currentQuestionIndex = (currentQuestionIndex + 1) % quizData.length;
+      loadQuestion(currentQuestionIndex);
+    }
+
+    // Change PDF Slide
+    function changeSlide() {
+      const pdfUrl = document.getElementById("slide-select").value;
+      document.getElementById("pdf-viewer").src = pdfUrl;
+    }
+
+    // Render Stats & Weak Areas
+    function renderStats() {
+      document.getElementById("stat-total").innerText = stats.total;
+      const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+      document.getElementById("stat-accuracy").innerText = `${acc}%`;
+
+      const breakdownDiv = document.getElementById("topic-breakdown");
+      breakdownDiv.innerHTML = "";
+
+      if (Object.keys(stats.topics).length === 0) {
+        breakdownDiv.innerText = "No quizzes completed yet.";
+        return;
+      }
+
+      for (const [topic, data] of Object.entries(stats.topics)) {
+        const topicAcc = Math.round((data.correct / data.attempted) * 100);
+        const statusColor = topicAcc < 70 ? "var(--danger)" : "var(--success)";
+        
+        const topicEl = document.createElement("div");
+        topicEl.style.margin = "0.75rem 0";
+        topicEl.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom: 0.25rem;">
+            <span><strong>${topic}</strong> (${data.correct}/${data.attempted})</span>
+            <span style="color: ${statusColor}; font-weight: bold;">${topicAcc}% Accuracy ${topicAcc < 70 ? '⚠️ Needs Review' : '✅ Mastered'}</span>
+          </div>
+        `;
+        breakdownDiv.appendChild(topicEl);
+      }
+    }
+
+    function resetStats() {
+      if (confirm("Reset all quiz analytics?")) {
+        localStorage.removeItem("study_stats");
+        stats = { total: 0, correct: 0, topics: {} };
+        renderStats();
+      }
+    }
+
+    // Initialize First Question
+    loadQuestion(0);
+  </script>
+</body>
+</html>
